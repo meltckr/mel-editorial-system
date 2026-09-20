@@ -45,7 +45,9 @@ export function validateRelease({ root = process.cwd(), build = 'build', qa = 'q
   const contentFile = requiredText(manifest.contentFile, 'contentFile');
   if (path.isAbsolute(contentFile) || contentFile.split(/[\\/]/).includes('..')) throw new Error('contentFile must remain inside the repository.');
   const content = JSON.parse(readFileSync(path.join(root, contentFile), 'utf8'));
-  if (content.clientReady !== true) throw new Error('Client content must explicitly be marked clientReady.');
+  const designProof = content.kind === 'design-proof' && manifest.publicationScope === 'design-proof';
+  if (!designProof && content.clientReady !== true) throw new Error('Client content must explicitly be marked clientReady.');
+  if (manifest.publicationScope === 'design-proof' && (content.kind !== 'design-proof' || content.clientReady !== false)) throw new Error('Design-proof approval cannot authorize a client edition.');
   requiredText(content.title, 'Content title');
   if (!Array.isArray(content.sections) || !content.sections.length) throw new Error('Client sections must be supplied.');
   for (const [index, section] of content.sections.entries()) {

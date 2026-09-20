@@ -5,17 +5,17 @@ import os from 'node:os';
 import path from 'node:path';
 import { fingerprintSource, fingerprintDirectory, validateRelease } from '../scripts/validate-release.mjs';
 
-function fixture(t) {
+function fixture(t, designProof = false) {
   const root = mkdtempSync(path.join(os.tmpdir(), 'editorial-release-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   for (const dir of ['release', 'src/lib/content', 'build', 'qa/screenshots', 'qa/pdf']) mkdirSync(path.join(root, dir), { recursive: true });
-  writeFileSync(path.join(root, 'src/lib/content/edition.json'), JSON.stringify({ clientReady: true, title: 'Reviewed edition', sections: [{ title: 'Finding', body: 'Verified supplied content.' }] }));
+  writeFileSync(path.join(root, 'src/lib/content/edition.json'), JSON.stringify({ clientReady: !designProof, ...(designProof ? {kind: 'design-proof'} : {}), title: 'Reviewed edition', sections: [{ title: 'Finding', body: 'Verified supplied content.' }] }));
   writeFileSync(path.join(root, 'build/index.html'), '<h1>Reviewed edition</h1>');
   for (const file of ['screenshots/home-desktop.png', 'screenshots/home-mobile.png', 'pdf/home.pdf']) writeFileSync(path.join(root, 'qa', file), 'test fixture');
   const sourceFingerprint = fingerprintSource(root);
   const buildFingerprint = fingerprintDirectory(path.join(root, 'build'));
   writeFileSync(path.join(root, 'qa/candidate.json'), JSON.stringify({ sourceFingerprint, buildFingerprint, routes: ['/mel-editorial-system/'], viewports: [{ name: 'desktop', width: 1280, height: 900 }, { name: 'mobile', width: 390, height: 844 }], completed: ['/mel-editorial-system/:desktop', '/mel-editorial-system/:mobile'], expectedChecks: 2, passed: true }));
-  const manifest = { schemaVersion: 1, status: 'ready', contentFile: 'src/lib/content/edition.json', reviewedSourceFingerprint: sourceFingerprint, reviewedBuildFingerprint: buildFingerprint, blockers: [], visualReview: { reviewer: 'Human reviewer', reviewedAt: '2026-09-20T00:00:00Z', evidence: 'https://example.com/review' }, approvalEvidence: 'https://example.com/approval' };
+  const manifest = { ...(designProof ? {publicationScope: 'design-proof'} : {}), schemaVersion: 1, status: 'ready', contentFile: 'src/lib/content/edition.json', reviewedSourceFingerprint: sourceFingerprint, reviewedBuildFingerprint: buildFingerprint, blockers: [], visualReview: { reviewer: 'Human reviewer', reviewedAt: '2026-09-20T00:00:00Z', evidence: 'https://example.com/review' }, approvalEvidence: 'https://example.com/approval' };
   const save = () => writeFileSync(path.join(root, 'release/manifest.json'), JSON.stringify(manifest));
   save();
   return { root, manifest, save };
@@ -67,4 +67,19 @@ test('duplicated results cannot substitute for mobile QA', (t) => {
   const candidate = JSON.parse(readFileSync(file)); candidate.completed[1] = candidate.completed[0];
   writeFileSync(file, JSON.stringify(candidate));
   assert.throws(() => validateRelease({ root }), /distinct desktop and mobile/);
+});
+
+test('explicitly approved design proof can publish while client content stays unready', (t) => {
+  const {root} = fixture(t, true);
+  assert.match(validateRelease({root}).sourceFingerprint, /^[a-f0-9]{64}$/);
+});
+test('design proof needs an explicit matching approval scope', (t) => {
+  const {root, manifest, save} = fixture(t, true);
+  delete manifest.publicationScope; save();
+  assert.throws(() => validateRelease({root}), /clientReady/);
+});
+test('design proof approval cannot publish a client edition', (t) => {
+  const {root, manifest, save} = fixture(t);
+  manifest.publicationScope = 'design-proof'; save();
+  assert.throws(() => validateRelease({root}), /cannot authorize a client edition/);
 });

@@ -4,7 +4,7 @@ An editorial publishing system for Mel Tucker. SvelteKit prerenders static HTML;
 
 ## Current state
 
-The first page is an explicitly labeled design specimen. Client copy, fact-checking of that copy, and Mel's screenshot approval are pending. No deployment is authorized yet.
+The first page is an explicitly labeled design specimen. Mel approved deployment of the reviewed specimen on September 19, 2026. Client copy and its separate fact-checking and visual approval remain pending. See the release record for publication evidence.
 
 ## Work locally
 
