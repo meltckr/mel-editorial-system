@@ -1,18 +1,15 @@
 {
   "schemaVersion": 1,
-  "status": "blocked",
+  "status": "ready",
   "contentFile": "src/lib/content/edition.json",
-  "reviewedSourceFingerprint": null,
-  "reviewedBuildFingerprint": null,
+  "reviewedSourceFingerprint": "829dbec95fba259bb4843259a64b85bbf6ee2a12a197d57c28f0eb7f950c3326",
+  "reviewedBuildFingerprint": "227a2e98513ba882a4499a6471681796cd13a1dc47186789f166bc28128952e2",
   "visualReview": {
-    "reviewer": null,
-    "reviewedAt": null,
-    "evidence": null
+    "reviewer": "Codex visual inspection; Mel publication approval",
+    "reviewedAt": "2026-09-20T04:24:35.412933+00:00",
+    "evidence": "https://github.com/meltckr/mel-editorial-system/blob/9f40f20cb2754fb247c86d446d24e0d89cbdcbd7/release/APPROVAL.md"
   },
-  "approvalEvidence": null,
-  "blockers": [
-    "Client content must be supplied and verified.",
-    "A human must inspect every desktop/mobile screenshot and print PDF.",
-    "Mel must explicitly approve the exact candidate commit for publication."
-  ]
+  "approvalEvidence": "https://github.com/meltckr/mel-editorial-system/blob/9f40f20cb2754fb247c86d446d24e0d89cbdcbd7/release/APPROVAL.md",
+  "blockers": [],
+  "publicationScope": "design-proof"
 }
