@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "contentFile": "src/lib/content/edition.json",
+  "reviewedSourceFingerprint": null,
+  "reviewedBuildFingerprint": null,
+  "visualReview": {
+    "reviewer": null,
+    "reviewedAt": null,
+    "evidence": null
+  },
+  "approvalEvidence": null,
+  "blockers": [
+    "Client content must be supplied and verified.",
+    "A human must inspect every desktop/mobile screenshot and print PDF.",
+    "Mel must explicitly approve the exact candidate commit for publication."
+  ]
+}

@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@import "./styles/tokens.css";
+html{background:var(--color-paper);color:var(--color-ink);font-family:var(--font-sans);scroll-behavior:smooth}
+body{margin:0} *{box-sizing:border-box} a{color:inherit;text-underline-offset:.22em} a:hover{color:var(--color-accent)}
+button{cursor:pointer} :focus-visible{outline:2px solid var(--color-accent);outline-offset:5px}
+.skip{position:absolute;left:1rem;top:-5rem;background:white;padding:1rem;z-index:10}.skip:focus{top:1rem}
+.page{max-width:var(--page);margin:auto;padding:0 2rem}
+.masthead{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--color-ink);padding:2rem 0 1.25rem;gap:1rem;font-size:var(--text-small)}
+.brand{white-space:nowrap;font-weight:700;letter-spacing:.01em}.label{font-size:var(--text-caption);letter-spacing:.12em;text-transform:uppercase;color:var(--color-muted)}
+.edition-header{display:grid;grid-template-columns:12rem 1fr;gap:3rem;padding:4rem 0 3rem;border-bottom:1px solid var(--color-rule)}
+.edition-meta p{margin:0 0 .75rem;font-size:var(--text-small);color:var(--color-muted)}
+h1,h2{font-family:var(--font-serif);font-weight:400;line-height:var(--leading-heading);text-wrap:balance}
+h1{font-size:var(--text-title);margin:.75rem 0 1.25rem;max-width:38rem}h2{font-size:var(--text-heading);margin:0 0 1.25rem}
+.deck{font-family:var(--font-serif);font-size:var(--text-deck);line-height:1.5;max-width:38rem;margin:0}
+.article-section{display:grid;grid-template-columns:12rem minmax(0,var(--measure));gap:3rem;margin:var(--space-section) 0}
+.section-index{font-size:var(--text-caption);color:var(--color-accent);padding-top:.5rem;font-variant-numeric:tabular-nums}
+.prose p{font-family:var(--font-serif);font-size:var(--text-body);line-height:var(--leading-body);margin:0 0 var(--space-paragraph)}
+.prose sup{font-family:var(--font-sans);font-size:var(--text-caption);margin-left:.2rem}
+figure{margin:2.5rem 0}figcaption{font-size:var(--text-small);line-height:1.5}.figure-title{font-weight:700;display:block;margin-bottom:.5rem}.chart{width:100%;min-height:280px;margin:1rem 0}.chart svg{max-width:100%;height:auto;font-family:var(--font-sans)}
+.source-note{color:var(--color-muted);font-size:var(--text-caption);line-height:1.6;margin-top:.75rem}details{font-size:var(--text-small)}summary{cursor:pointer}table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:var(--text-small)}th,td{text-align:left;border-bottom:1px solid var(--color-rule);padding:.6rem 0}th:last-child,td:last-child{text-align:right}
+.sources{padding-top:2rem;border-top:1px solid var(--color-rule)}.sources ol{padding-left:1.3rem;list-style:decimal}.sources li{font-size:var(--text-small);line-height:1.7;margin-bottom:1rem;overflow-wrap:anywhere}.sources a{font-weight:700}
+.footer{border-top:1px solid var(--color-ink);padding:1.5rem 0 3rem;display:flex;justify-content:space-between;font-size:var(--text-caption);color:var(--color-muted);gap:1rem}
+@media(max-width:700px){.page{padding:0 1.25rem}.masthead{padding-top:1.5rem;align-items:flex-start}.edition-header{grid-template-columns:1fr;gap:1.5rem;padding:2.5rem 0}.edition-meta{display:flex;gap:1rem;flex-wrap:wrap}.edition-meta p{margin:0}.article-section{grid-template-columns:1fr;gap:.75rem;margin:3rem 0}.section-index{padding:0}.footer{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+@page{size:Letter;margin:.65in .7in}
+@media print{html{background:white;color:black;font-size:10pt}.page{padding:0;max-width:none}.no-print,.skip,details{display:none!important}.masthead{padding:0 0 .15in}.edition-header{grid-template-columns:1.2in 1fr;gap:.3in;padding:.3in 0}.article-section{grid-template-columns:.3in 1fr;gap:.2in;margin:.3in 0}.edition-meta p{font-size:8pt}h2{break-after:avoid}.prose p{line-height:1.5;orphans:3;widows:3}figure{break-inside:avoid;margin:.2in 0}.chart{min-height:0}.chart svg{max-height:2.6in;width:100%}.sources li{font-size:8pt}.sources a::after{content:" (" attr(href) ")";font-weight:400}.footer{padding:.15in 0 0}a{text-decoration:none}*{animation:none!important;transition:none!important}}
+
+.prose .source-note{font-family:var(--font-sans);font-size:var(--text-caption);line-height:1.6}
+@media print{.article-section{display:block}.section-index{display:none}.chart svg{max-height:none}.prose .source-note{font-size:8pt}}

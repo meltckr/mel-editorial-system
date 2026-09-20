@@ -1,0 +1,24 @@
+@theme {
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --color-paper: #f8f6f0;
+  --color-ink: #272b28;
+  --color-muted: #62675f;
+  --color-rule: #d2d1c6;
+  --color-accent: #98462d;
+  --text-caption: .75rem;
+  --text-small: .875rem;
+  --text-body: 1.125rem;
+  --text-deck: 1.375rem;
+  --text-heading: 1.875rem;
+  --text-title: 2.75rem;
+  --spacing: .25rem;
+}
+:root {
+ --measure: 42rem; --page: 68rem;
+ --space-section: 4rem; --space-paragraph: 1.25rem;
+ --leading-body: 1.65; --leading-heading: 1.12;
+}
+
+@media(max-width:700px){:root{--text-title:2.15rem;--text-deck:1.2rem;--text-heading:1.6rem;--text-body:1.0625rem;--space-section:3rem}}
+@media print{:root{--text-title:28pt;--text-deck:13pt;--text-heading:18pt;--text-body:11pt;--text-small:8pt}}

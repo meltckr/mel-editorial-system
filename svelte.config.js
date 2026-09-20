@@ -1,21 +1,4 @@
-import adapterStatic from "@sveltejs/adapter-static";
-import { sveltePreprocess } from "svelte-preprocess";
-import autoprefixer from "autoprefixer";
-
-const preprocess = sveltePreprocess({
-	postcss: {
-		plugins: [autoprefixer]
-	}
-});
-
-const config = {
-	compilerOptions: {
-		runes: true
-	},
-	preprocess,
-	kit: {
-		adapter: adapterStatic({ strict: false })
-	}
-};
-
-export default config;
+import { fingerprintSource } from './scripts/validate-release.mjs';
+import adapter from '@sveltejs/adapter-static';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+export default { preprocess: vitePreprocess(), kit: { version: {name: fingerprintSource()}, adapter: adapter({strict:true}), paths: {base:'/mel-editorial-system'} } };

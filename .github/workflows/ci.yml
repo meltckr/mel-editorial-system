@@ -1,0 +1,42 @@
+name: Editorial QA
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node --test tests/release-check.test.mjs
+      - run: npm run check
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run qa
+      - name: Preserve screenshots, PDFs and test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-qa-${{ github.sha }}
+          path: |
+            qa/
+            playwright-report/
+            test-results/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Preserve exact successful candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-candidate-${{ github.sha }}
+          path: |
+            build/
+            qa/
+          retention-days: 30
+          if-no-files-found: error

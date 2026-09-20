@@ -1,235 +1,42 @@
-# Svelte Starter
+# Mel editorial system
 
-This [starter template](https://github.com/the-pudding/svelte-starter) aims to quickly scaffold a [SvelteKit](https://kit.svelte.dev/) project, designed around data-driven, visual stories at [The Pudding](https://pudding.cool).
+An editorial publishing system for Mel Tucker. SvelteKit prerenders static HTML; GitHub Actions checks each page at desktop and mobile sizes before a separately approved GitHub Pages release.
 
-### Notes
-* _Do not use or reproduce The Pudding logos or fonts without written permission._
-* _Please remove the [goatcounter analytics line](https://github.com/the-pudding/svelte-starter/blob/main/src/app.html#L9) ._
-* _Prettier Formatting: Disable any text editor Prettier extensions to take advantage of the built-in rules._
+## Current state
 
-### Features
+The first page is an explicitly labeled design specimen. Client copy, fact-checking of that copy, and Mel's screenshot approval are pending. No deployment is authorized yet.
 
-- [ArchieML](http://archieml.org/) for micro-CMS powered by Google Docs and Sheets
-- [Lucide Icons](https://lucide.dev/) for simple/easy svg icons
-- [Style Dictionary](https://amzn.github.io/style-dictionary/) for CSS/JS style parity
-- [Runed](https://runed.dev/docs) for svelte5 rune utilities
-- CSV, JSON, and SVG imports
-- SSR static-hosted builds by default
+## Work locally
 
-## Quickstart
-#### From Scratch
-* Click the green `Use this template` button above.
-* Alternatively: `npx degit the-pudding/svelte-starter my-project`
+Use Node 22.22+ (Node 24 LTS recommended).
 
-#### Pre-existing Project
-* clone the repo
-
-#### Installation
-* In your local repo run `pnpm install` or `npm install`
-
-## Development
-
-```bash
+```sh
+npm ci
 npm run dev
-```
-
-Change the script in `package.json` to `"dev": "svelte-kit dev --host"` to test on your local network on a different device.
-
-## Deploy
-Check out the `Makefile` for specific tasks.
-
-### Staging (on Github)
-```bash
-npm run staging
-```
-
-### Production (on AWS for pudding.cool)
-```bash
-npm run prodution
-```
-
-### Manual
-```bash
+npm run check
 npm run build
-```
-This generates a directory called `build` with the statically rendered app.
-
-### Password-Protected
-To create a password-protected build:
-
-Make sure you have a `.env` file in your root with a value of `PASSWORD=yourpassword` 
-```bash
-make protect
+npx playwright install chromium
+npm run qa
 ```
 
-Then run either `make github` or `make pudding`.
+The local URL includes `/mel-editorial-system/`. QA runs the production preview at port 4173, discovers all built HTML routes, captures desktop and mobile screenshots, and writes print PDFs into `qa/`. Inspect every image and every PDF page. Passing browser checks alone does not constitute visual approval. See `release/README.md` for release gates.
 
-## Style
+## One visual language
 
-There are a few stylesheets included by default in `src/styles`. Refer to them in `app.css`, the place for applying global styles.
+`src/styles/tokens.css` owns type, colors, spacing and reading measure. Tailwind utilities consume the same theme. `src/app.css` contains editorial layout and Letter print rules. Fonts are system Georgia and Arial; there are no external font requests, tracking scripts, icon packs or decorative imagery.
 
-For variable parity in both CSS and JS, modify files in the `properties` folder using the [Style Dictionary](https://amzn.github.io/style-dictionary/) API.
+`src/lib/components/EvidenceChart.svelte` demonstrates Observable Plot, responsive width, exact value labels, a zero origin, an accessible data table and a no-JavaScript fallback. The demonstration data are synthetic and labeled. Replace or omit this figure according to the actual article's needs.
 
-Run `npm run style` to regenerate the style dictionary.
+Motion provides one restrained entrance treatment, respects reduced-motion preferences, and leaves all content visible before JavaScript loads. The page is static HTML with progressive enhancement.
 
-#### Some css utility classes in reset.css
-* `.sr-only`: makes content invisible available for screen reader
-* `.text-outline`: adds a psuedo stroke to text element
+## Content and verification
 
-### Custom Fonts
-For locally hosted fonts, simply add the font to the `static/assets` folder and include a reference in `src/styles/font.css`, making sure the url starts with `"assets/..."`.
+`src/lib/content/edition.json` records title, sections and client readiness. The current route is a specimen; replacing JSON alone does not finish a client piece. Edit the article composition, deck, references, metadata and chart together. Record claim-by-claim source checks, dates, and unresolved claims in the edition's source ledger. Visible numbered citations must point to the specific supporting source. A chart is optional; never invent data to fill a design.
 
-## Google Docs and Sheets
+## Publishing
 
-* Create a Google Doc or Sheet
-* Click `Share` -> `Advanced` -> `Change...` -> `Anyone with this link`
-* In the address bar, grab the ID - eg. "...com/document/d/**1IiA5a5iCjbjOYvZVgPcjGzMy5PyfCzpPF-LnQdCdFI0**/edit"
-* paste in the ID above into `google.config.js`, and set the filepath to where you want the file saved
-* If you want to do a Google Sheet, be sure to include the `gid` value in the url as well
+Deploy only after client content is complete and Mel has approved the exact desktop/mobile screenshots. Preserve the evidence and approved source fingerprint. Deployment is manual, guarded by the release manifest and the protected `github-pages` environment; it never runs merely because main changes. GitHub Pages is public. Repository code may be public, but confidential drafts must remain local until public publication is authorized.
 
-Running `npm run gdoc` at any point (even in new tab while server is running) will fetch the latest from all Docs and Sheets.
+## Foundation
 
-## Structural Overview
-
-### Pages
-The `src/routes` directory contains pages for your app. For a single-page app (most cases) you don't have to modify anything in here. `+page.svelte` represents the root page, think of it as the `index.html` file. It is prepopulated with a few things like metadata and font preloading. It also includes a reference to a blank slate component `src/components/Index.svelte`. This is the file you want to really start in for your app.
-
-### Embedding Data
-For smaller datasets, it is often great to embed the data into the HTML file. If you want to use data as-is, you can use normal import syntax (e.g., `import data from "$data/file.csv"`). If you are working with data but you want to preserve the original or clean/parse just what you need to use in the browser to optimize the front-end payload, you can load it via `+page.server.js`, do some work on it, and return just what you need. This is passed automatically to `+page.svelte` and accessible in any component with `getContext("data")`.
-
-
-## Pre-loaded helpers
-
-### Components
-
-Located in `src/components`.
-
-```js
-// Usage
-import Example from "$components/Example.svelte";
-```
-
-* `Footer.svelte`: Pudding recirculation and social links.
-* `Header.svelte`: Pudding masthead.
-
-### Helper Components
-
-Located in `src/components/helpers`.
-
-```js
-// Usage
-import Example from "$components/helpers/Example.svelte";
-```
-
-*Available*
-* `Scrolly.svelte`: Scrollytelling.
-
-*Need to migrate*
-* `ButtonSet.svelte`: Accessible button group inputs.
-* `Chunk.svelte`: Split text into smaller dom element chunks.
-* `Countdown.svelte`: Countdown timer text.
-* `DarkModeToggle.svelte`: A toggle button for dark mode.
-* `Figure.svelte`: A barebones chart figure component to handle slots.
-* `MotionToggle.svelte`: A toggle button to enable/disable front-end user motion preference.
-* `Range.svelte`: Customizable range slider.
-* `ShareLink.svelte`: Button to share link natively/copy to clipboard.
-* `SortTable.svelte`: Sortable semantic table with customizable props.
-* `Slider.svelte (and Slider.Slide.svelte)`: A slider widget, especially useful for swipe/slide stories.
-* `Tap.svelte`: Edge-of-screen tapping library, designed to integrate with slider.
-* `Tip.svelte`: Button that links to Strip payment link.
-* `Toggle.svelte`: Accessible toggle inputs.
-
-### Headless Components
-
-[bits UI](https://www.bits-ui.com/docs/introduction) comes pre-installed. It is recommended to use these for any UI components.
-
-### Layercake Chart Components
-
-Starter templates for various chart types to be used with [LayerCake](https://layercake.graphics/). Located in `src/components/layercake`.
-
-*Note:* You must install the module `layercake` first.
-
-```js
-// Usage
-import Example from "$components/layercake/Example.svelte";
-```
-
-### Actions
-
-Located in `src/actions`.
-
-```js
-// Usage
-import example from "$actions/action.js";
-```
-
-* `canTab.js`: enable/disable tabbing on child elements.
-* `checkOverlap.js`: Label overlapping detection. Loops through selection of nodes and adds a class to the ones that are overlapping. Once one is hidden it ignores it.
-* `focusTrap.js`: Enable a keyboard focus trap for modals and menus.
-* `keepWithinBox.js`: Offsets and element left/right to stay within parent.
-* `inView.js`: detect when an element enters or exits the viewport.
-* `resize.js`: detect when an element is resized.
-
-### Runes
-
-These are located in `src/runes`. You can put custom ones in `src/runes/misc.js` or create unique files for more complex ones.
-
-```js
-import { example } from "$runes/misc/misc.js";
-```
-
-* `useWindowDimensions`: returns an object `{ width, height }` of the viewport dimensions. It is debounced for performance.
-* `useClipboard`: copy content to clipboard.
-* `useFetcher`: load async data from endpoints (local or external).
-* `useWindowFocus`: determine if the window is in focus or not.
-
-For more preset runes, use [runed](https://runed.dev/docs) which is preloaded. 
-
-### Utils
-
-Located in `src/utils/`.
-
-```js
-// Usage
-import example from "$utils/example.js";
-```
-* `checkScrollDir.js`: Gets the user's scroll direction ("up" or "down")
-* `csvDownload.js`: Converts a flat array of data to CSV content ready to be used as an `href` value for download.
-* `generateId.js`: Generate an alphanumeric id.
-* `loadCsv.js`: Loads and parses a CSV file.
-* `loadImage.js`: Loads an image.
-* `loadJson.js`: Loads and parses a JSON file.
-* `loadPixels.js`: Loads the pixel data of an image via an offscreen canvas.
-* `localStorage.js`: Read and write to local storage.
-* `mapToArray.js`: Convenience function to convert a map to an array.
-* `move.js`: transform translate function shorthand.
-* `transformSvg.js`: Custom transition lets you apply an svg transform property with the in/out svelte transition. Parameters (with defaults):
-* `translate.js`: Convenience function for transform translate css.
-* `urlParams.js`: Get and set url parameters.
-
-## Tips
-
-### Image asset paths
-For `img` tags, use relative paths:
-
-```html
-<img src="assets/demo/test.jpg" />
-```
-
-or use `base` if on a sub route:
-
-```html
-<script>
-	import { base } from "$app/paths";
-</script>
-
-<img src="{base}/assets/demo/test.jpg"  />
-```
-
-For CSS background images, use absolute paths:
-
-```css
-background: url("/assets/demo/test.jpg");
-```
-
-View example code in the preloaded demo.
+Based on The Pudding's open-source Svelte starter. See `PROVENANCE.md` and the retained MIT `LICENSE`. No Pudding licensed fonts or logos are included.

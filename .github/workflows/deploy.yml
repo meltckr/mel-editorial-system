@@ -1,0 +1,83 @@
+name: Publish approved candidate
+on:
+  workflow_dispatch:
+    inputs:
+      approved_commit:
+        description: Full commit SHA explicitly approved by Mel
+        required: true
+        type: string
+      qa_run_id:
+        description: Successful Editorial QA run for that exact commit
+        required: true
+        type: string
+      approval_evidence:
+        description: HTTPS reference to explicit publication approval for this candidate
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check exact candidate, successful QA and required environment reviewers
+        uses: actions/github-script@v7
+        env:
+          APPROVED_COMMIT: ${{ inputs.approved_commit }}
+          QA_RUN_ID: ${{ inputs.qa_run_id }}
+          APPROVAL_EVIDENCE: ${{ inputs.approval_evidence }}
+        with:
+          script: |
+            const sha = process.env.APPROVED_COMMIT;
+            if (!/^[a-f0-9]{40}$/.test(sha)) throw new Error('Supply a full approved commit SHA.');
+            if (!/^\d+$/.test(process.env.QA_RUN_ID)) throw new Error('Supply a numeric QA run ID.');
+            if (!/^https:\/\//.test(process.env.APPROVAL_EVIDENCE)) throw new Error('Approval evidence must be an HTTPS reference.');
+            const { owner, repo } = context.repo;
+            const { data: run } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: Number(process.env.QA_RUN_ID) });
+            if (run.head_sha !== sha || run.conclusion !== 'success' || run.status !== 'completed' || run.path !== '.github/workflows/ci.yml' || !['push', 'workflow_dispatch'].includes(run.event) || run.head_repository.full_name !== `${owner}/${repo}` || run.head_branch !== 'main') {
+              throw new Error('QA must be a successful same-repository Editorial QA run for the exact approved commit.');
+            }
+            const { data: environment } = await github.rest.repos.getEnvironment({ owner, repo, environment_name: 'github-pages' });
+            const reviewers = environment.protection_rules?.find(rule => rule.type === 'required_reviewers');
+            if (!reviewers?.reviewers?.length || environment.can_admins_bypass !== false) {
+              throw new Error('Configure required reviewers and disable administrator bypass on the github-pages environment before publishing.');
+            }
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.approved_commit }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: reviewed-candidate-${{ inputs.approved_commit }}
+          run-id: ${{ inputs.qa_run_id }}
+          github-token: ${{ github.token }}
+          path: /tmp/reviewed-candidate
+      - name: Validate reviewed source, client content and exact build
+        env:
+          APPROVED_COMMIT: ${{ inputs.approved_commit }}
+          APPROVAL_EVIDENCE: ${{ inputs.approval_evidence }}
+          CANDIDATE_BUILD: /tmp/reviewed-candidate/build
+          CANDIDATE_QA: /tmp/reviewed-candidate/qa/candidate.json
+        run: npm run release:check
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: /tmp/reviewed-candidate/build
+  deploy:
+    needs: gate
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy the approved artifact
+        id: deployment
+        uses: actions/deploy-pages@v4
